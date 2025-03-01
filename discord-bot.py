@@ -15,12 +15,17 @@ class MyClient(discord.Client):
     async def on_ready(self):
         print(f'Logged on as {self.user}!')
 
+
     async def on_message(self, message):
         url = f'{MODEL_SERVER_IP}/check'
         data = {'sentence': message.content}
         headers = {'Content-Type': 'application/json'}
         response = requests.post(url, data=json.dumps(data), headers=headers)
-        print(response.text)
+        data = json.loads(response.text)
+        print(data)
+        if(data['is_racist'] and data['score'] > 0.85):
+            await message.delete()
+            await message.channel.send(f'Hi there {message.author}. Can you stop being racist?')
 
         print(f'Message from {message.author}: {message.content}')
 
